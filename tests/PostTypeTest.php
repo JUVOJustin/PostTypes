@@ -148,15 +148,16 @@ class PostTypeTest extends TestCase
     {
 
         $this->postType->capabilities();
+        $singular = strtolower($this->postType->singular);
         $defaultCapabilities = [
-            "edit_post"          => "edit_{$this->postType->singular}",
-            "read_post"          => "read_{$this->postType->singular}",
-            "delete_post"        => "delete_{$this->postType->singular}",
-            "edit_posts"         => "edit_{$this->postType->plural}",
-            "edit_others_posts"  => "edit_others_{$this->postType->plural}",
-            "publish_posts"      => "publish_{$this->postType->plural}",
-            "read_private_posts" => "read_private_{$this->postType->plural}",
-            "create_posts"       => "edit_{$this->postType->plural}",
+            "edit_post"          => "edit_$singular",
+            "read_post"          => "read_$singular",
+            "delete_post"        => "delete_$singular",
+            "edit_posts"         => "edit_{$this->postType->slug}",
+            "edit_others_posts"  => "edit_others_{$this->postType->slug}",
+            "publish_posts"      => "publish_{$this->postType->slug}",
+            "read_private_posts" => "read_private_{$this->postType->slug}",
+            "create_posts"       => "edit_{$this->postType->slug}",
         ];
 
         // Default version set with only
@@ -167,14 +168,14 @@ class PostTypeTest extends TestCase
 
         // Test with custom capabilities passed
         $customCapabilities = [
-            "edit_post"          => "edit_{$this->postType->singular}123",
-            "read_post"          => "read_{$this->postType->singular}123",
-            "delete_post"        => "delete_{$this->postType->singular}123",
-            "edit_posts"         => "edit_{$this->postType->plural}123",
-            "edit_others_posts"  => "edit_others_{$this->postType->plural}123",
-            "publish_posts"      => "publish_{$this->postType->plural}123",
-            "read_private_posts" => "read_private_{$this->postType->plural}123",
-            "create_posts"       => "edit_{$this->postType->plural}123",
+            "edit_post"          => "edit_{$singular}123",
+            "read_post"          => "read_{$singular}123",
+            "delete_post"        => "delete_{$singular}123",
+            "edit_posts"         => "edit_{$this->postType->slug}123",
+            "edit_others_posts"  => "edit_others_{$this->postType->slug}123",
+            "publish_posts"      => "publish_{$this->postType->slug}123",
+            "read_private_posts" => "read_private_{$this->postType->slug}123",
+            "create_posts"       => "edit_{$this->postType->slug}123",
         ];
 
         $this->postType->capabilities($customCapabilities);
