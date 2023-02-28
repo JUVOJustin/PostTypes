@@ -381,15 +381,16 @@ class PostType
         if (!empty($capabilities)) {
             $this->capabilities = $capabilities;
         } else {
+            $singular = strtolower($this->singular);
             $this->capabilities = [
-                "edit_post"          => "edit_{$this->singular}",
-                "read_post"          => "read_{$this->singular}",
-                "delete_post"        => "delete_{$this->singular}",
-                "edit_posts"         => "edit_{$this->plural}",
-                "edit_others_posts"  => "edit_others_{$this->plural}",
-                "publish_posts"      => "publish_{$this->plural}",
-                "read_private_posts" => "read_private_{$this->plural}",
-                "create_posts"       => "edit_{$this->plural}",
+                "edit_post"          => "edit_$singular",
+                "read_post"          => "read_$singular",
+                "delete_post"        => "delete_$singular",
+                "edit_posts"         => "edit_{$this->slug}",
+                "edit_others_posts"  => "edit_others_{$this->slug}",
+                "publish_posts"      => "publish_{$this->slug}",
+                "read_private_posts" => "read_private_{$this->slug}",
+                "create_posts"       => "edit_{$this->slug}",
             ];
         }
 
@@ -413,7 +414,7 @@ class PostType
             $role = get_role($role);
 
             // Check if role is in whitelist
-            if (in_array($role->name, wp_roles()->role_names)) {
+            if (in_array($role->name, array_keys(wp_roles()->roles))) {
                 foreach ($this->capabilities as $cap) {
                     $role->add_cap($cap);
                 }
