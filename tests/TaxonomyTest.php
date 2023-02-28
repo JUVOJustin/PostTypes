@@ -6,21 +6,24 @@ use PostTypes\Columns;
 
 class TaxonomyTest extends TestCase
 {
+    
+    private Taxonomy $taxonomy;
+    
     protected function setUp(): void
     {
-        $this->genres = new Taxonomy('genre');
+        $this->taxonomy = new Taxonomy('genre');
     }
 
     /** @test */
     public function canCreateTaxonomy()
     {
-        $this->assertInstanceOf(Taxonomy::class, $this->genres);
+        $this->assertInstanceOf(Taxonomy::class, $this->taxonomy);
     }
 
     /** @test */
     public function hasNameOnInstantiation()
     {
-        $this->assertEquals('genre', $this->genres->names['name']);
+        $this->assertEquals('genre', $this->taxonomy->names['name']);
     }
 
     /** @test */
@@ -41,7 +44,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function hasOptionsOnInstantiation()
     {
-        $this->assertEquals($this->genres->options, []);
+        $this->assertEquals($this->taxonomy->options, []);
     }
 
     /** @test */
@@ -59,7 +62,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function hasLabelsOnInstatiation()
     {
-        $this->assertEquals($this->genres->labels, []);
+        $this->assertEquals($this->taxonomy->labels, []);
     }
 
     /** @test */
@@ -78,7 +81,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function posttypesEmptyOnInstantiation()
     {
-        $this->assertEquals($this->genres->posttypes, []);
+        $this->assertEquals($this->taxonomy->posttypes, []);
     }
 
     /** @test */
@@ -104,12 +107,12 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function namesCreatedFromName()
     {
-        $this->genres->createNames();
+        $this->taxonomy->createNames();
 
-        $this->assertEquals($this->genres->name, 'genre');
-        $this->assertEquals($this->genres->singular, 'Genre');
-        $this->assertEquals($this->genres->plural, 'Genres');
-        $this->assertEquals($this->genres->slug, 'genres');
+        $this->assertEquals($this->taxonomy->name, 'genre');
+        $this->assertEquals($this->taxonomy->singular, 'Genre');
+        $this->assertEquals($this->taxonomy->plural, 'Genres');
+        $this->assertEquals($this->taxonomy->slug, 'genres');
     }
 
     /** @test */
@@ -122,29 +125,29 @@ class TaxonomyTest extends TestCase
             'slug' => 'slug-genres',
         ];
 
-        $this->genres->names($names);
+        $this->taxonomy->names($names);
 
-        $this->genres->createNames();
+        $this->taxonomy->createNames();
 
-        $this->assertEquals($this->genres->name, 'genre');
-        $this->assertEquals($this->genres->singular, 'Single Genre');
-        $this->assertEquals($this->genres->plural, 'Multiple Genres');
-        $this->assertEquals($this->genres->slug, 'slug-genres');
+        $this->assertEquals($this->taxonomy->name, 'genre');
+        $this->assertEquals($this->taxonomy->singular, 'Single Genre');
+        $this->assertEquals($this->taxonomy->plural, 'Multiple Genres');
+        $this->assertEquals($this->taxonomy->slug, 'slug-genres');
     }
 
     /** @test */
     public function defaultOptionsUsedIfNotSet()
     {
         // generated options
-        $options = $this->genres->createOptions();
+        $options = $this->taxonomy->createOptions();
 
         // expected options
         $defaults = [
             'hierarchical' => true,
             'show_admin_column' => true,
-            'labels' => $this->genres->createLabels(),
+            'labels' => $this->taxonomy->createLabels(),
             'rewrite' => [
-                'slug' => $this->genres->slug,
+                'slug' => $this->taxonomy->slug,
             ],
         ];
 
@@ -154,12 +157,12 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function columnsIsNullOnInstantiation()
     {
-        $this->assertEquals($this->genres->columns, null);
+        $this->assertEquals($this->taxonomy->columns, null);
     }
 
     /** @test */
     public function columnsReturnsInstanceOfColumns()
     {
-        $this->assertInstanceOf(Columns::class, $this->genres->columns());
+        $this->assertInstanceOf(Columns::class, $this->taxonomy->columns());
     }
 }

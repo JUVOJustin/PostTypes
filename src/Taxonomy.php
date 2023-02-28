@@ -84,10 +84,11 @@ class Taxonomy
 
     /**
      * Set the names for the Taxonomy
-     * @param  mixed $names The name(s) for the Taxonomy
+     * @param mixed $names The name(s) for the Taxonomy
      * @return $this
      */
-    public function names($names): Taxonomy {
+    public function names($names): Taxonomy
+    {
         if (is_string($names)) {
             $names = ['name' => $names];
         }
@@ -102,10 +103,11 @@ class Taxonomy
 
     /**
      * Set options for the Taxonomy
-     * @param  array $options
+     * @param array $options
      * @return $this
      */
-    public function options(array $options = []): Taxonomy {
+    public function options(array $options = []): Taxonomy
+    {
         $this->options = $options;
 
         return $this;
@@ -113,10 +115,11 @@ class Taxonomy
 
     /**
      * Set the Taxonomy labels
-     * @param  array  $labels
+     * @param array $labels
      * @return $this
      */
-    public function labels(array $labels = []): Taxonomy {
+    public function labels(array $labels = []): Taxonomy
+    {
         $this->labels = $labels;
 
         return $this;
@@ -124,10 +127,11 @@ class Taxonomy
 
     /**
      * Assign a PostType to register the Taxonomy to
-     * @param  mixed $posttypes
+     * @param mixed $posttypes
      * @return $this
      */
-    public function posttype($posttypes): Taxonomy {
+    public function posttype($posttypes): Taxonomy
+    {
         $posttypes = is_string($posttypes) ? [$posttypes] : $posttypes;
 
         foreach ($posttypes as $posttype) {
@@ -141,7 +145,8 @@ class Taxonomy
      * Get the Column Manager for the Taxonomy
      * @return Columns
      */
-    public function columns(): Columns {
+    public function columns(): Columns
+    {
         if (!isset($this->columns)) {
             $this->columns = new Columns;
         }
@@ -184,7 +189,7 @@ class Taxonomy
     public function registerTaxonomy()
     {
         // Get the existing taxonomy options if it exists.
-        $options = (taxonomy_exists($this->name)) ? (array) get_taxonomy($this->name) : [];
+        $options = (taxonomy_exists($this->name)) ? (array)get_taxonomy($this->name) : [];
 
         // create options for the Taxonomy.
         $options = array_replace_recursive($options, $this->createOptions());
@@ -252,12 +257,13 @@ class Taxonomy
      * Create options for Taxonomy
      * @return array Options to pass to register_taxonomy
      */
-    public function createOptions(): array {
+    public function createOptions(): array
+    {
         // default options
         $options = [
-            'hierarchical' => true,
+            'hierarchical'      => true,
             'show_admin_column' => true,
-            'rewrite' => [
+            'rewrite'           => [
                 'slug' => $this->slug,
             ],
         ];
@@ -277,26 +283,27 @@ class Taxonomy
      * Create labels for the Taxonomy
      * @return array
      */
-    public function createLabels(): array {
+    public function createLabels(): array
+    {
         // default labels
         $labels = [
-            'name' => $this->plural,
-            'singular_name' => $this->singular,
-            'menu_name' => $this->plural,
-            'all_items' => "All {$this->plural}",
-            'edit_item' => "Edit {$this->singular}",
-            'view_item' => "View {$this->singular}",
-            'update_item' => "Update {$this->singular}",
-            'add_new_item' => "Add New {$this->singular}",
-            'new_item_name' => "New {$this->singular} Name",
-            'parent_item' => "Parent {$this->plural}",
-            'parent_item_colon' => "Parent {$this->plural}:",
-            'search_items' => "Search {$this->plural}",
-            'popular_items' => "Popular {$this->plural}",
+            'name'                       => $this->plural,
+            'singular_name'              => $this->singular,
+            'menu_name'                  => $this->plural,
+            'all_items'                  => "All {$this->plural}",
+            'edit_item'                  => "Edit {$this->singular}",
+            'view_item'                  => "View {$this->singular}",
+            'update_item'                => "Update {$this->singular}",
+            'add_new_item'               => "Add New {$this->singular}",
+            'new_item_name'              => "New {$this->singular} Name",
+            'parent_item'                => "Parent {$this->plural}",
+            'parent_item_colon'          => "Parent {$this->plural}:",
+            'search_items'               => "Search {$this->plural}",
+            'popular_items'              => "Popular {$this->plural}",
             'separate_items_with_commas' => "Seperate {$this->plural} with commas",
-            'add_or_remove_items' => "Add or remove {$this->plural}",
-            'choose_from_most_used' => "Choose from most used {$this->plural}",
-            'not_found' => "No {$this->plural} found",
+            'add_or_remove_items'        => "Add or remove {$this->plural}",
+            'choose_from_most_used'      => "Choose from most used {$this->plural}",
+            'not_found'                  => "No {$this->plural} found",
         ];
 
         return array_replace($labels, $this->labels);
@@ -304,10 +311,11 @@ class Taxonomy
 
     /**
      * Modify the columns for the Taxonomy
-     * @param  array  $columns  The WordPress default columns
+     * @param array $columns The WordPress default columns
      * @return array
      */
-    public function modifyColumns($columns): array {
+    public function modifyColumns($columns): array
+    {
         $columns = $this->columns->modifyColumns($columns);
 
         return $columns;
@@ -333,7 +341,8 @@ class Taxonomy
      * Make custom columns sortable
      * @param array $columns Default WordPress sortable columns
      */
-    public function setSortableColumns(array $columns): array {
+    public function setSortableColumns(array $columns): array
+    {
         if (!empty($this->columns()->sortable)) {
             $columns = array_merge($columns, $this->columns()->sortable);
         }

@@ -6,32 +6,35 @@ use PostTypes\Columns;
 
 class PostTypeTest extends TestCase
 {
+    
+    private PostType $postType;
+    
     protected function setUp(): void
     {
         // setup basic PostType
-        $this->books = new PostType('book');
+        $this->postType = new PostType('book');
     }
 
     /** @test */
     public function canCreatePostType()
     {
-        $this->assertInstanceOf(PostType::class, $this->books);
+        $this->assertInstanceOf(PostType::class, $this->postType);
     }
 
     /** @test */
     public function hasNameOnInstantiation()
     {
-        $this->assertEquals($this->books->names['name'], 'book');
+        $this->assertEquals($this->postType->names['name'], 'book');
     }
 
     /** @test */
     public function hasNamesOnInstantiation()
     {
         $names = [
-            'name' => 'book',
+            'name'     => 'book',
             'singular' => 'Book',
-            'plural' => 'Books',
-            'slug' => 'books'
+            'plural'   => 'Books',
+            'slug'     => 'books'
         ];
 
         $books = new PostType($names);
@@ -42,7 +45,7 @@ class PostTypeTest extends TestCase
     /** @test */
     public function hasOptionsOnInstantiation()
     {
-        $this->assertEquals($this->books->options, []);
+        $this->assertEquals($this->postType->options, []);
     }
 
     /** @test */
@@ -60,14 +63,14 @@ class PostTypeTest extends TestCase
     /** @test */
     public function hasLabelsOnInstantiation()
     {
-        $this->assertEquals($this->books->labels, []);
+        $this->assertEquals($this->postType->labels, []);
     }
 
     /** @test */
     public function hasCustomLabelsOnInstantiation()
     {
         $labels = [
-            'name' => 'Books',
+            'name'    => 'Books',
             'add_new' => 'Add New Book'
         ];
 
@@ -79,13 +82,13 @@ class PostTypeTest extends TestCase
     /** @test */
     public function taxonomiesEmptyOnInstantiation()
     {
-        $this->assertEquals($this->books->taxonomies, []);
+        $this->assertEquals($this->postType->taxonomies, []);
     }
 
     /** @test */
     public function hasCustomTaxonomiesWhenPassed()
     {
-        $books = $this->books;
+        $books = $this->postType;
 
         $books->taxonomy('genre');
 
@@ -95,7 +98,7 @@ class PostTypeTest extends TestCase
     /** @test */
     public function canAddMultipleTaxonomies()
     {
-        $books = $this->books;
+        $books = $this->postType;
 
         $books->taxonomy(['genre', 'publisher']);
 
@@ -105,13 +108,13 @@ class PostTypeTest extends TestCase
     /** @test */
     public function filtersNullOnInstantiation()
     {
-        $this->assertNull($this->books->filters);
+        $this->assertNull($this->postType->filters);
     }
 
     /** @test */
     public function hasFiltersWhenAdded()
     {
-        $books = $this->books;
+        $books = $this->postType;
 
         $books->filters(['genre']);
 
@@ -121,13 +124,13 @@ class PostTypeTest extends TestCase
     /** @test */
     public function iconNullOnInstantiation()
     {
-        $this->assertNull($this->books->icon);
+        $this->assertNull($this->postType->icon);
     }
 
     /** @test */
     public function hasIconWhenSet()
     {
-        $books = $this->books;
+        $books = $this->postType;
 
         $books->icon('dashicon-book-alt');
 
@@ -135,60 +138,104 @@ class PostTypeTest extends TestCase
     }
 
     /** @test */
+    public function capabilitiesNullOnInstantiation()
+    {
+        $this->assertNull($this->postType->capabilities);
+    }
+
+    /** @test */
+    public function hasCapabilitiesWhenSet()
+    {
+
+        $this->postType->capabilities();
+        $defaultCapabilities = [
+            "edit_post"          => "edit_{$this->postType->singular}",
+            "read_post"          => "read_{$this->postType->singular}",
+            "delete_post"        => "delete_{$this->postType->singular}",
+            "edit_posts"         => "edit_{$this->postType->plural}",
+            "edit_others_posts"  => "edit_others_{$this->postType->plural}",
+            "publish_posts"      => "publish_{$this->postType->plural}",
+            "read_private_posts" => "read_private_{$this->postType->plural}",
+            "create_posts"       => "edit_{$this->postType->plural}",
+        ];
+
+        // Default version set with only
+        $this->assertEquals($this->postType->capabilities, $defaultCapabilities);
+
+        // Test if added to global options array
+        $this->assertEquals($this->postType->createOptions()['capabilities'], $defaultCapabilities);
+
+        // Test with custom capabilities passed
+        $customCapabilities = [
+            "edit_post"          => "edit_{$this->postType->singular}123",
+            "read_post"          => "read_{$this->postType->singular}123",
+            "delete_post"        => "delete_{$this->postType->singular}123",
+            "edit_posts"         => "edit_{$this->postType->plural}123",
+            "edit_others_posts"  => "edit_others_{$this->postType->plural}123",
+            "publish_posts"      => "publish_{$this->postType->plural}123",
+            "read_private_posts" => "read_private_{$this->postType->plural}123",
+            "create_posts"       => "edit_{$this->postType->plural}123",
+        ];
+
+        $this->postType->capabilities($customCapabilities);
+        $this->assertEquals($this->postType->capabilities, $customCapabilities);
+    }
+
+    /** @test */
     public function columnsIsNullOnInstantiation()
     {
-        $this->assertEquals($this->books->columns, null);
+        $this->assertEquals($this->postType->columns, null);
     }
 
     /** @test */
     public function columnsReturnsInstanceOfColumns()
     {
-        $this->assertInstanceOf(Columns::class, $this->books->columns());
+        $this->assertInstanceOf(Columns::class, $this->postType->columns());
     }
 
     /** @test */
     public function namesCreatedFromName()
     {
-        $this->books->createNames();
+        $this->postType->createNames();
 
-        $this->assertEquals($this->books->name, 'book');
-        $this->assertEquals($this->books->singular, 'Book');
-        $this->assertEquals($this->books->plural, 'Books');
-        $this->assertEquals($this->books->slug, 'books');
+        $this->assertEquals($this->postType->name, 'book');
+        $this->assertEquals($this->postType->singular, 'Book');
+        $this->assertEquals($this->postType->plural, 'Books');
+        $this->assertEquals($this->postType->slug, 'books');
     }
 
     /** @test */
     public function passedNamesAreUsed()
     {
         $names = [
-            'name' => 'book',
+            'name'     => 'book',
             'singular' => 'Single Book',
-            'plural' => 'Multiple Books',
-            'slug' => 'slug_books',
+            'plural'   => 'Multiple Books',
+            'slug'     => 'slug_books',
         ];
 
-        $this->books->names($names);
+        $this->postType->names($names);
 
-        $this->books->createNames();
+        $this->postType->createNames();
 
-        $this->assertEquals($this->books->name, 'book');
-        $this->assertEquals($this->books->singular, 'Single Book');
-        $this->assertEquals($this->books->plural, 'Multiple Books');
-        $this->assertEquals($this->books->slug, 'slug_books');
+        $this->assertEquals($this->postType->name, 'book');
+        $this->assertEquals($this->postType->singular, 'Single Book');
+        $this->assertEquals($this->postType->plural, 'Multiple Books');
+        $this->assertEquals($this->postType->slug, 'slug_books');
     }
 
     /** @test */
     public function defaultOptionsUsedIfNotSet()
     {
         // generated options
-        $options = $this->books->createOptions();
+        $options = $this->postType->createOptions();
 
         // expected options
         $defaults = [
-            'public' => true,
-            'labels' => $this->books->createLabels(),
+            'public'  => true,
+            'labels'  => $this->postType->createLabels(),
             'rewrite' => [
-                'slug' => $this->books->slug
+                'slug' => $this->postType->slug
             ]
         ];
 
@@ -198,22 +245,22 @@ class PostTypeTest extends TestCase
     /** @test */
     public function defaultLabelsAreGenerated()
     {
-        $labels = $this->books->createLabels();
+        $labels = $this->postType->createLabels();
 
         $defaults = [
-            'name' => $this->books->plural,
-            'singular_name' => $this->books->singular,
-            'menu_name' => $this->books->plural,
-            'all_items' => $this->books->plural,
-            'add_new' => "Add New",
-            'add_new_item' => "Add New {$this->books->singular}",
-            'edit_item' => "Edit {$this->books->singular}",
-            'new_item' => "New {$this->books->singular}",
-            'view_item' => "View {$this->books->singular}",
-            'search_items' => "Search {$this->books->plural}",
-            'not_found' => "No {$this->books->plural} found",
-            'not_found_in_trash' => "No {$this->books->plural} found in Trash",
-            'parent_item_colon' => "Parent {$this->books->singular}:",
+            'name'               => $this->postType->plural,
+            'singular_name'      => $this->postType->singular,
+            'menu_name'          => $this->postType->plural,
+            'all_items'          => $this->postType->plural,
+            'add_new'            => "Add New",
+            'add_new_item'       => "Add New {$this->postType->singular}",
+            'edit_item'          => "Edit {$this->postType->singular}",
+            'new_item'           => "New {$this->postType->singular}",
+            'view_item'          => "View {$this->postType->singular}",
+            'search_items'       => "Search {$this->postType->plural}",
+            'not_found'          => "No {$this->postType->plural} found",
+            'not_found_in_trash' => "No {$this->postType->plural} found in Trash",
+            'parent_item_colon'  => "Parent {$this->postType->singular}:",
         ];
 
         $this->assertEquals($labels, $defaults);
@@ -222,7 +269,7 @@ class PostTypeTest extends TestCase
     /** @test */
     public function filtersAreEmptyIfNotSetAndNoTaxonomies()
     {
-        $filters = $this->books->getFilters();
+        $filters = $this->postType->getFilters();
 
         $this->assertEquals($filters, []);
     }
@@ -230,9 +277,9 @@ class PostTypeTest extends TestCase
     /** @test */
     public function filtersAreSameAsTaxonomyIfNotSet()
     {
-        $this->books->taxonomy('genre');
+        $this->postType->taxonomy('genre');
 
-        $filters = $this->books->getFilters();
+        $filters = $this->postType->getFilters();
 
         $this->assertEquals($filters, ['genre']);
     }
@@ -240,11 +287,11 @@ class PostTypeTest extends TestCase
     /** @test */
     public function filtersAreWhatAssignedIfPassed()
     {
-        $this->books->filters(['genre', 'published']);
+        $this->postType->filters(['genre', 'published']);
 
-        $this->books->taxonomy('genre');
+        $this->postType->taxonomy('genre');
 
-        $filters = $this->books->getFilters();
+        $filters = $this->postType->getFilters();
 
         $this->assertEquals($filters, ['genre', 'published']);
     }
@@ -252,11 +299,11 @@ class PostTypeTest extends TestCase
     /** @test */
     public function filtersAreEmptyIfSetWithEmptyArray()
     {
-        $this->books->filters([]);
+        $this->postType->filters([]);
 
-        $this->books->taxonomy('genre');
+        $this->postType->taxonomy('genre');
 
-        $filters = $this->books->getFilters();
+        $filters = $this->postType->getFilters();
 
         $this->assertEquals($filters, []);
     }

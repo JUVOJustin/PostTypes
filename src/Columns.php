@@ -68,8 +68,8 @@ class Columns
 
     /**
      * Add a new column
-     * @param string|array  $columns   the slug of the column
-     * @param string|null $label    the label for the column
+     * @param string|array $columns the slug of the column
+     * @param string|null $label the label for the column
      */
     public function add($columns, string $label = null)
     {
@@ -91,9 +91,10 @@ class Columns
 
     /**
      * Add a column to hide
-     * @param  string|array $columns the slug of the column to hdie
+     * @param string|array $columns the slug of the column to hdie
      */
-    public function hide($columns): Columns {
+    public function hide($columns): Columns
+    {
         if (!is_array($columns)) {
             $columns = [$columns];
         }
@@ -107,10 +108,11 @@ class Columns
 
     /**
      * Set a custom callback to populate a column
-     * @param  string $column   the column slug
-     * @param  mixed  $callback callback function
+     * @param string $column the column slug
+     * @param mixed $callback callback function
      */
-    public function populate($column, $callback): Columns {
+    public function populate($column, $callback): Columns
+    {
         $this->populate[$column] = $callback;
 
         return $this;
@@ -121,7 +123,8 @@ class Columns
      * @param array $columns an array of columns
      * @return Columns
      */
-    public function order(array $columns): Columns {
+    public function order(array $columns): Columns
+    {
         foreach ($columns as $column => $position) {
             $this->positions[$column] = $position;
         }
@@ -131,10 +134,11 @@ class Columns
 
     /**
      * Set columns that are sortable
-     * @param array $sortable 
+     * @param array $sortable
      * @return Columns
      */
-    public function sortable(array $sortable): Columns {
+    public function sortable(array $sortable): Columns
+    {
         foreach ($sortable as $column => $options) {
             $this->sortable[$column] = $options;
         }
@@ -144,9 +148,10 @@ class Columns
 
     /**
      * Check if an orderby field is a custom sort option.
-     * @param string $orderby  the orderby value from query params
+     * @param string $orderby the orderby value from query params
      */
-    public function isSortable(string $orderby): bool {
+    public function isSortable(string $orderby): bool
+    {
         if (array_key_exists($orderby, $this->sortable)) {
             return true;
         }
@@ -165,7 +170,7 @@ class Columns
 
     /**
      * Get meta key for an orderby.
-     * @param string $orderby  the orderby value from query params
+     * @param string $orderby the orderby value from query params
      */
     public function sortableMeta(string $orderby)
     {
@@ -190,7 +195,8 @@ class Columns
      * @param array $columns WordPress default columns
      * @return array           The modified columns
      */
-    public function modifyColumns(array $columns): array {
+    public function modifyColumns(array $columns): array
+    {
         // if user defined set columns, return those
         if (!empty($this->items)) {
             return $this->items;

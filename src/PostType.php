@@ -82,8 +82,20 @@ class PostType
     public $columns;
 
     /**
+     * Sets the capabilities of the PostType
+     * @var array
+     */
+    public $capabilities;
+
+    /**
+     * Stores user roles that should be granted capabilities of post type
+     * @var array
+     */
+    public $whitelisted_roles;
+
+    /**
      * Create a PostType
-     * @param mixed $names   A string for the name, or an array of names
+     * @param mixed $names A string for the name, or an array of names
      * @param array $options An array of options for the PostType
      * @param array $labels An array of labels for the PostType
      */
@@ -101,10 +113,11 @@ class PostType
 
     /**
      * Set the names for the PostType
-     * @param  mixed $names A string for the name, or an array of names
+     * @param mixed $names A string for the name, or an array of names
      * @return $this
      */
-    public function names($names): PostType {
+    public function names($names): PostType
+    {
         // only the post type name is passed
         if (is_string($names)) {
             $names = ['name' => $names];
@@ -121,10 +134,11 @@ class PostType
 
     /**
      * Set the options for the PostType
-     * @param  array $options An array of options for the PostType
+     * @param array $options An array of options for the PostType
      * @return $this
      */
-    public function options(array $options): PostType {
+    public function options(array $options): PostType
+    {
         $this->options = $options;
 
         return $this;
@@ -132,10 +146,11 @@ class PostType
 
     /**
      * Set the labels for the PostType
-     * @param  array $labels An array of labels for the PostType
+     * @param array $labels An array of labels for the PostType
      * @return $this
      */
-    public function labels(array $labels): PostType {
+    public function labels(array $labels): PostType
+    {
         $this->labels = $labels;
 
         return $this;
@@ -143,10 +158,11 @@ class PostType
 
     /**
      * Add a Taxonomy to the PostType
-     * @param  mixed $taxonomies The Taxonomy name(s) to add
+     * @param mixed $taxonomies The Taxonomy name(s) to add
      * @return $this
      */
-    public function taxonomy($taxonomies): PostType {
+    public function taxonomy($taxonomies): PostType
+    {
         $taxonomies = is_string($taxonomies) ? [$taxonomies] : $taxonomies;
 
         foreach ($taxonomies as $taxonomy) {
@@ -158,10 +174,11 @@ class PostType
 
     /**
      * Add filters to the PostType
-     * @param  array $filters An array of Taxonomy filters
+     * @param array $filters An array of Taxonomy filters
      * @return $this
      */
-    public function filters(array $filters): PostType {
+    public function filters(array $filters): PostType
+    {
         $this->filters = $filters;
 
         return $this;
@@ -169,10 +186,11 @@ class PostType
 
     /**
      * Set the menu icon for the PostType
-     * @param  string $icon A dashicon class for the menu icon
+     * @param string $icon A dashicon class for the menu icon
      * @return $this
      */
-    public function icon($icon): PostType {
+    public function icon($icon): PostType
+    {
         $this->icon = $icon;
 
         return $this;
@@ -193,7 +211,8 @@ class PostType
      * Get the Column Manager for the PostType
      * @return Columns
      */
-    public function columns(): Columns {
+    public function columns(): Columns
+    {
         if (!isset($this->columns)) {
             $this->columns = new Columns;
         }
@@ -214,6 +233,9 @@ class PostType
             add_filter('register_post_type_args', [$this, 'modifyPostType'], 10, 2);
         }
 
+        // Add capabilities to roles
+        add_action('init', [$this, 'grantCapabilities']);
+
         // register Taxonomies to the PostType
         add_action('init', [$this, 'registerTaxonomies']);
 
@@ -228,7 +250,7 @@ class PostType
             add_filter("manage_{$this->name}_posts_custom_column", [$this, 'populateColumns'], 10, 2);
 
             // run filter to make columns sortable.
-            add_filter('manage_edit-'.$this->name.'_sortable_columns', [$this, 'setSortableColumns']);
+            add_filter('manage_edit-' . $this->name . '_sortable_columns', [$this, 'setSortableColumns']);
 
             // run action that sorts columns on request.
             add_action('pre_get_posts', [$this, 'sortSortableColumns']);
@@ -258,7 +280,8 @@ class PostType
      * @param string $posttype
      * @return array
      */
-    public function modifyPostType(array $args, string $posttype): array {
+    public function modifyPostType(array $args, string $posttype): array
+    {
         if ($posttype !== $this->name) {
             return $args;
         }
@@ -321,10 +344,11 @@ class PostType
      * Create options for PostType
      * @return array Options to pass to register_post_type
      */
-    public function createOptions(): array {
+    public function createOptions(): array
+    {
         // default options
         $options = [
-            'public' => true,
+            'public'  => true,
             'rewrite' => [
                 'slug' => $this->slug
             ]
@@ -343,29 +367,81 @@ class PostType
             $options['menu_icon'] = $this->icon;
         }
 
+        // set capabilities
+        if (!isset($options['capabilities']) && !empty($this->capabilities)) {
+            $options['capabilities'] = $this->capabilities;
+        }
+
         return $options;
+    }
+
+    public function capabilities(array $capabilities = [], array $whitelisted_roles = [])
+    {
+
+        if (!empty($capabilities)) {
+            $this->capabilities = $capabilities;
+        } else {
+            $this->capabilities = [
+                "edit_post"          => "edit_{$this->singular}",
+                "read_post"          => "read_{$this->singular}",
+                "delete_post"        => "delete_{$this->singular}",
+                "edit_posts"         => "edit_{$this->plural}",
+                "edit_others_posts"  => "edit_others_{$this->plural}",
+                "publish_posts"      => "publish_{$this->plural}",
+                "read_private_posts" => "read_private_{$this->plural}",
+                "create_posts"       => "edit_{$this->plural}",
+            ];
+        }
+
+        // Set whitelisted roles to use later in init action
+        $this->whitelisted_roles = $whitelisted_roles;
+    }
+
+    public function grantCapabilities()
+    {
+
+        if (empty($this->whitelisted_roles)) {
+            return;
+        }
+
+        foreach ($this->whitelisted_roles as $role) {
+            // Check if role exists
+            if (!wp_roles()->is_role($role)) {
+                continue;
+            }
+
+            $role = get_role($role);
+
+            // Check if role is in whitelist
+            if (in_array($role->name, wp_roles()->role_names)) {
+                foreach ($this->capabilities as $cap) {
+                    $role->add_cap($cap);
+                }
+            }
+        }
     }
 
     /**
      * Create the labels for the PostType
      * @return array
      */
-    public function createLabels(): array {
+    public function createLabels(): array
+    {
         // default labels
         $labels = [
-            'name' => $this->plural,
-            'singular_name' => $this->singular,
-            'menu_name' => $this->plural,
-            'all_items' => $this->plural,
-            'add_new' => "Add New",
-            'add_new_item' => "Add New {$this->singular}",
-            'edit_item' => "Edit {$this->singular}",
-            'new_item' => "New {$this->singular}",
-            'view_item' => "View {$this->singular}",
-            'search_items' => "Search {$this->plural}",
-            'not_found' => "No {$this->plural} found",
+            'name'               => $this->plural,
+            'singular_name'      => $this->singular,
+            'menu_name'          => $this->plural,
+            'all_items'          => $this->plural,
+            'add_new'            => "Add New",
+            'add_new_item'       => "Add New {$this->singular}",
+            'edit_item'          => "Edit {$this->singular}",
+            'new_item'           => "New {$this->singular}",
+            'view_item'          => "View {$this->singular}",
+            'search_items'       => "Search {$this->plural}",
+            'not_found'          => "No {$this->plural} found",
             'not_found_in_trash' => "No {$this->plural} found in Trash",
-            'parent_item_colon' => "Parent {$this->singular}:",
+            'parent_item_colon'  => "Parent {$this->singular}:",
         ];
 
         return array_replace_recursive($labels, $this->labels);
@@ -442,7 +518,8 @@ class PostType
      * Calculate the filters for the PostType
      * @return array
      */
-    public function getFilters(): array {
+    public function getFilters(): array
+    {
         // default filters are empty
         $filters = [];
 
@@ -463,10 +540,11 @@ class PostType
 
     /**
      * Modify the columns for the PostType
-     * @param array $columns  Default WordPress columns
+     * @param array $columns Default WordPress columns
      * @return array            The modified columns
      */
-    public function modifyColumns(array $columns): array {
+    public function modifyColumns(array $columns): array
+    {
         $columns = $this->columns->modifyColumns($columns);
 
         return $columns;
@@ -474,8 +552,8 @@ class PostType
 
     /**
      * Populate custom columns for the PostType
-     * @param string $column   The column slug
-     * @param int $post_id  The post ID
+     * @param string $column The column slug
+     * @param int $post_id The post ID
      */
     public function populateColumns(string $column, int $post_id)
     {
@@ -486,7 +564,7 @@ class PostType
 
     /**
      * Make custom columns sortable
-     * @param array $columns  Default WordPress sortable columns
+     * @param array $columns Default WordPress sortable columns
      */
     public function setSortableColumns(array $columns)
     {
