@@ -1,12 +1,12 @@
-# PostTypes v2.2
+# PostTypes v2.3
 
-[![tests](https://github.com/jjgrainger/PostTypes/actions/workflows/tests.yml/badge.svg)](https://github.com/jjgrainger/PostTypes/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/jjgrainger/PostTypes/branch/master/graph/badge.svg?token=SGrK2xDF46)](https://codecov.io/gh/jjgrainger/PostTypes) [![Latest Stable Version](https://flat.badgen.net/github/release/jjgrainger/PostTypes/stable)](https://packagist.org/packages/jjgrainger/posttypes) [![Total Downloads](https://flat.badgen.net/packagist/dt/jjgrainger/PostTypes)](https://packagist.org/packages/jjgrainger/posttypes) [![License](https://flat.badgen.net/github/license/jjgrainger/PostTypes)](https://packagist.org/packages/jjgrainger/posttypes)
+[![tests](https://github.com/JUVOJustin/PostTypes/actions/workflows/tests.yml/badge.svg)](https://github.com/JUVOJustin/PostTypes/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/JUVOJustin/PostTypes/branch/master/graph/badge.svg?token=SGrK2xDF46)](https://codecov.io/gh/JUVOJustin/PostTypes) [![Latest Stable Version](https://flat.badgen.net/github/release/JUVOJustin/PostTypes/stable)](https://packagist.org/packages/juvo/posttypes) [![Total Downloads](https://flat.badgen.net/packagist/dt/juvo/PostTypes)](https://packagist.org/packages/juvo/posttypes) [![License](https://flat.badgen.net/github/license/juvo/PostTypes)](https://packagist.org/packages/juvo/posttypes)
 
-> Simple WordPress custom post types.
+> Simple WordPress custom post types library based on the work of [**Joe Grainger**](https://jjgrainger.co.uk)
 
 ## Requirements
 
-* PHP >=7.2
+* PHP >=7.4
 * [Composer](https://getcomposer.org/)
 * [WordPress](https://wordpress.org) >=5.1
 
@@ -17,7 +17,7 @@
 Run the following in your terminal to install PostTypes with [Composer](https://getcomposer.org/).
 
 ```
-$ composer require jjgrainger/posttypes
+$ composer require juvo/posttypes
 ```
 
 PostTypes uses [PSR-4](https://www.php-fig.org/psr/psr-4/) autoloading and can be used with the Composer's autoloader. Below is a basic example of getting started, though your setup may be different depending on how you are using Composer.
@@ -58,6 +58,9 @@ $books->columns()->hide( [ 'date', 'author' ] );
 // Set the Books menu icon.
 $books->icon( 'dashicons-book-alt' );
 
+// Add custom capabilities
+$books->capabilities([], ['editor', 'author']);
+
 // Register the post type to WordPress.
 $books->register();
 
@@ -81,7 +84,7 @@ $genres->register();
 * Licensed under the [MIT License](https://github.com/jjgrainger/PostTypes/blob/master/LICENSE)
 * Maintained under the [Semantic Versioning Guide](https://semver.org)
 
-## Author
+## Original Author
 
 **Joe Grainger**
 

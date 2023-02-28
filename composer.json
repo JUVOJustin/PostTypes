@@ -1,21 +1,25 @@
 {
-    "name": "jjgrainger/posttypes",
+    "name": "juvo/posttypes",
     "description": "Simple WordPress custom post types.",
     "keywords": ["wordpress", "post-types"],
     "license": "MIT",
     "homepage": "https://posttypes.jjgrainger.co.uk",
     "support": {
-        "issues": "https://github.com/jjgrainger/posttypes/issues",
-        "source": "https://github.com/jjgrainger/posttypes"
+        "issues": "https://github.com/JUVOJustin/PostTypes/issues",
+        "source": "https://github.com/JUVOJustin/PostTypes"
     },
     "authors": [
         {
             "name": "Joe Grainger",
             "homepage": "https://jjgrainger.co.uk"
+        },
+        {
+            "name": "Justin Vogt",
+            "homepage": "https://juvo-design.de"
         }
     ],
     "require": {
-        "php": ">=7.2"
+        "php": ">=7.4"
     },
     "require-dev": {
         "phpunit/phpunit": "8.*",

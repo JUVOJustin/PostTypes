@@ -155,14 +155,51 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    public function columnsIsNullOnInstantiation()
+    public function columnsIsEmptyOnInstantiation()
     {
-        $this->assertEquals($this->taxonomy->columns, null);
+        $this->assertInstanceOf(Columns::class, $this->taxonomy->columns);
+        $this->assertEmpty($this->taxonomy->columns->items);
     }
 
     /** @test */
     public function columnsReturnsInstanceOfColumns()
     {
         $this->assertInstanceOf(Columns::class, $this->taxonomy->columns());
+    }
+
+    /** @test */
+    public function capabilitiesEmptyOnInstantiation()
+    {
+        $this->assertEmpty($this->taxonomy->capabilities);
+    }
+
+    /** @test */
+    public function hasCapabilitiesWhenSet()
+    {
+
+        $this->taxonomy->capabilities();
+        $defaultCapabilities = [
+            'manage_terms'	=>	'manage_'.$this->taxonomy->slug,
+            'edit_terms'	=>	'edit_'.$this->taxonomy->slug,
+            'delete_terms'	=>	'delete'.$this->taxonomy->slug,
+            'assign_terms'	=>	'assign_'.$this->taxonomy->slug,
+        ];
+
+        // Default version set with only
+        $this->assertEquals($this->taxonomy->capabilities, $defaultCapabilities);
+
+        // Test if added to global options array
+        $this->assertEquals($this->taxonomy->createOptions()['capabilities'], $defaultCapabilities);
+
+        // Test with custom capabilities passed
+        $customCapabilities = [
+            'manage_terms'	=>	'manage_'.$this->taxonomy->slug. '-123',
+            'edit_terms'	=>	'edit_'.$this->taxonomy->slug. '-123',
+            'delete_terms'	=>	'delete'.$this->taxonomy->slug. '-123',
+            'assign_terms'	=>	'assign_'.$this->taxonomy->slug. '-123',
+        ];
+
+        $this->taxonomy->capabilities($customCapabilities);
+        $this->assertEquals($this->taxonomy->capabilities, $customCapabilities);
     }
 }

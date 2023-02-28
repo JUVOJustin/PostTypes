@@ -42,6 +42,9 @@ $books->icon( 'dashicons-book-alt' );
 // Register the PostType to WordPress
 $books->register();
 
+// Add custom capabilities
+$books->capabilities([], ['editor', 'author']);
+
 // Create the genre Taxonomy
 $genres = new Taxonomy( 'genre' );
 

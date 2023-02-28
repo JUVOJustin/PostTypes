@@ -13,49 +13,8 @@ namespace PostTypes;
  * @version 2.0
  * @license https://opensource.org/licenses/mit-license.html MIT License
  */
-class PostType
+class PostType extends Base
 {
-    /**
-     * The names passed to the PostType
-     * @var array
-     */
-    public $names;
-
-    /**
-     * The name for the PostType
-     * @var string
-     */
-    public $name;
-
-    /**
-     * The singular for the PostType
-     * @var string
-     */
-    public $singular;
-
-    /**
-     * The plural name for the PostType
-     * @var string
-     */
-    public $plural;
-
-    /**
-     * The slug for the PostType
-     * @var string
-     */
-    public $slug;
-
-    /**
-     * Options for the PostType
-     * @var array
-     */
-    public $options;
-
-    /**
-     * Labels for the PostType
-     * @var array
-     */
-    public $labels;
 
     /**
      * Taxonomies for the PostType
@@ -76,42 +35,6 @@ class PostType
     public $icon;
 
     /**
-     * The column manager for the PostType
-     * @var Columns
-     */
-    public $columns;
-
-    /**
-     * Sets the capabilities of the PostType
-     * @var array
-     */
-    public $capabilities;
-
-    /**
-     * Stores user roles that should be granted capabilities of post type
-     * @var array
-     */
-    public $whitelisted_roles;
-
-    /**
-     * Create a PostType
-     * @param mixed $names A string for the name, or an array of names
-     * @param array $options An array of options for the PostType
-     * @param array $labels An array of labels for the PostType
-     */
-    public function __construct($names, array $options = [], array $labels = [])
-    {
-        // assign names to the PostType
-        $this->names($names);
-
-        // assign custom options to the PostType
-        $this->options($options);
-
-        // assign labels to the PostType
-        $this->labels($labels);
-    }
-
-    /**
      * Set the names for the PostType
      * @param mixed $names A string for the name, or an array of names
      * @return $this
@@ -128,30 +51,6 @@ class PostType
 
         // create names for the PostType
         $this->createNames();
-
-        return $this;
-    }
-
-    /**
-     * Set the options for the PostType
-     * @param array $options An array of options for the PostType
-     * @return $this
-     */
-    public function options(array $options): PostType
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
-    /**
-     * Set the labels for the PostType
-     * @param array $labels An array of labels for the PostType
-     * @return $this
-     */
-    public function labels(array $labels): PostType
-    {
-        $this->labels = $labels;
 
         return $this;
     }
@@ -205,19 +104,6 @@ class PostType
     public function flush(bool $hard = true)
     {
         flush_rewrite_rules($hard);
-    }
-
-    /**
-     * Get the Column Manager for the PostType
-     * @return Columns
-     */
-    public function columns(): Columns
-    {
-        if (!isset($this->columns)) {
-            $this->columns = new Columns;
-        }
-
-        return $this->columns;
     }
 
     /**
@@ -398,30 +284,6 @@ class PostType
         $this->whitelisted_roles = $whitelisted_roles;
     }
 
-    public function grantCapabilities()
-    {
-
-        if (empty($this->whitelisted_roles)) {
-            return;
-        }
-
-        foreach ($this->whitelisted_roles as $role) {
-            // Check if role exists
-            if (!wp_roles()->is_role($role)) {
-                continue;
-            }
-
-            $role = get_role($role);
-
-            // Check if role is in whitelist
-            if (in_array($role->name, array_keys(wp_roles()->roles))) {
-                foreach ($this->capabilities as $cap) {
-                    $role->add_cap($cap);
-                }
-            }
-        }
-    }
-
     /**
      * Create the labels for the PostType
      * @return array
@@ -540,18 +402,6 @@ class PostType
     }
 
     /**
-     * Modify the columns for the PostType
-     * @param array $columns Default WordPress columns
-     * @return array            The modified columns
-     */
-    public function modifyColumns(array $columns): array
-    {
-        $columns = $this->columns->modifyColumns($columns);
-
-        return $columns;
-    }
-
-    /**
      * Populate custom columns for the PostType
      * @param string $column The column slug
      * @param int $post_id The post ID
@@ -561,19 +411,6 @@ class PostType
         if (isset($this->columns->populate[$column])) {
             call_user_func_array($this->columns()->populate[$column], [$column, $post_id]);
         }
-    }
-
-    /**
-     * Make custom columns sortable
-     * @param array $columns Default WordPress sortable columns
-     */
-    public function setSortableColumns(array $columns)
-    {
-        if (!empty($this->columns()->sortable)) {
-            $columns = array_merge($columns, $this->columns()->sortable);
-        }
-
-        return $columns;
     }
 
     /**

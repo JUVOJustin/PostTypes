@@ -13,49 +13,8 @@ namespace PostTypes;
  * @version 2.0
  * @license https://opensource.org/licenses/mit-license.html MIT License
  */
-class Taxonomy
+class Taxonomy extends Base
 {
-    /**
-     * The names passed to the Taxonomy
-     * @var mixed
-     */
-    public $names;
-
-    /**
-     * The Taxonomy name
-     * @var string
-     */
-    public $name;
-
-    /**
-     * The singular label for the Taxonomy
-     * @var string
-     */
-    public $singular;
-
-    /**
-     * The plural label for the Taxonomy
-     * @var string
-     */
-    public $plural;
-
-    /**
-     * The Taxonomy slug
-     * @var string
-     */
-    public $slug;
-
-    /**
-     * Custom options for the Taxonomy
-     * @var array
-     */
-    public $options;
-
-    /**
-     * Custom labels for the Taxonomy
-     * @var array
-     */
-    public $labels;
 
     /**
      * PostTypes to register the Taxonomy to
@@ -67,20 +26,7 @@ class Taxonomy
      * The column manager for the Taxonomy
      * @var mixed
      */
-    public $columns;
-
-    /**
-     * Create a Taxonomy
-     * @param mixed $names The name(s) for the Taxonomy
-     */
-    public function __construct($names, $options = [], $labels = [])
-    {
-        $this->names($names);
-
-        $this->options($options);
-
-        $this->labels($labels);
-    }
+    public Columns $columns;
 
     /**
      * Set the names for the Taxonomy
@@ -102,30 +48,6 @@ class Taxonomy
     }
 
     /**
-     * Set options for the Taxonomy
-     * @param array $options
-     * @return $this
-     */
-    public function options(array $options = []): Taxonomy
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
-    /**
-     * Set the Taxonomy labels
-     * @param array $labels
-     * @return $this
-     */
-    public function labels(array $labels = []): Taxonomy
-    {
-        $this->labels = $labels;
-
-        return $this;
-    }
-
-    /**
      * Assign a PostType to register the Taxonomy to
      * @param mixed $posttypes
      * @return $this
@@ -142,19 +64,6 @@ class Taxonomy
     }
 
     /**
-     * Get the Column Manager for the Taxonomy
-     * @return Columns
-     */
-    public function columns(): Columns
-    {
-        if (!isset($this->columns)) {
-            $this->columns = new Columns;
-        }
-
-        return $this->columns;
-    }
-
-    /**
      * Register the Taxonomy to WordPress
      * @return void
      */
@@ -166,6 +75,9 @@ class Taxonomy
 
         // assign taxonomy to post type objects
         add_action('init', [$this, 'registerTaxonomyToObjects']);
+
+        // Add capabilities to roles
+        add_action('init', [$this, 'grantCapabilities']);
 
         if (isset($this->columns)) {
             // modify the columns for the Taxonomy
@@ -276,7 +188,30 @@ class Taxonomy
             $options['labels'] = $this->createLabels();
         }
 
+        // set capabilities
+        if (!isset($options['capabilities']) && !empty($this->capabilities)) {
+            $options['capabilities'] = $this->capabilities;
+        }
+
         return $options;
+    }
+
+    public function capabilities(array $capabilities = [], array $whitelisted_roles = [])
+    {
+
+        if (!empty($capabilities)) {
+            $this->capabilities = $capabilities;
+        } else {
+            $this->capabilities = [
+                'manage_terms' => 'manage_' . $this->slug,
+                'edit_terms'   => 'edit_' . $this->slug,
+                'delete_terms' => 'delete' . $this->slug,
+                'assign_terms' => 'assign_' . $this->slug,
+            ];
+        }
+
+        // Set whitelisted roles to use later in init action
+        $this->whitelisted_roles = $whitelisted_roles;
     }
 
     /**

@@ -138,9 +138,9 @@ class PostTypeTest extends TestCase
     }
 
     /** @test */
-    public function capabilitiesNullOnInstantiation()
+    public function capabilitiesEmptyOnInstantiation()
     {
-        $this->assertNull($this->postType->capabilities);
+        $this->assertEmpty($this->postType->capabilities);
     }
 
     /** @test */
@@ -183,9 +183,10 @@ class PostTypeTest extends TestCase
     }
 
     /** @test */
-    public function columnsIsNullOnInstantiation()
+    public function columnsIsEmptyOnInstantiation()
     {
-        $this->assertEquals($this->postType->columns, null);
+        $this->assertInstanceOf(Columns::class, $this->postType->columns);
+        $this->assertEmpty($this->postType->columns->items);
     }
 
     /** @test */
