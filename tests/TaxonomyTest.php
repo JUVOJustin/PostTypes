@@ -181,7 +181,7 @@ class TaxonomyTest extends TestCase
         $defaultCapabilities = [
             'manage_terms'	=>	'manage_'.$this->taxonomy->slug,
             'edit_terms'	=>	'edit_'.$this->taxonomy->slug,
-            'delete_terms'	=>	'delete'.$this->taxonomy->slug,
+            'delete_terms'	=>	'delete_'.$this->taxonomy->slug,
             'assign_terms'	=>	'assign_'.$this->taxonomy->slug,
         ];
 

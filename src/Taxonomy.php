@@ -205,7 +205,7 @@ class Taxonomy extends Base
             $this->capabilities = [
                 'manage_terms' => 'manage_' . $this->slug,
                 'edit_terms'   => 'edit_' . $this->slug,
-                'delete_terms' => 'delete' . $this->slug,
+                'delete_terms' => 'delete_' . $this->slug,
                 'assign_terms' => 'assign_' . $this->slug,
             ];
         }
