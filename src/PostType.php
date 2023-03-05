@@ -35,27 +35,6 @@ class PostType extends Base
     public $icon;
 
     /**
-     * Set the names for the PostType
-     * @param mixed $names A string for the name, or an array of names
-     * @return $this
-     */
-    public function names($names): PostType
-    {
-        // only the post type name is passed
-        if (is_string($names)) {
-            $names = ['name' => $names];
-        }
-
-        // set the names array
-        $this->names = $names;
-
-        // create names for the PostType
-        $this->createNames();
-
-        return $this;
-    }
-
-    /**
      * Add a Taxonomy to the PostType
      * @param mixed $taxonomies The Taxonomy name(s) to add
      * @return $this
@@ -184,7 +163,7 @@ class PostType extends Base
      * Create the required names for the PostType
      * @return void
      */
-    public function createNames()
+    public function createNames(): void
     {
         // names required for the PostType
         $required = [
@@ -195,9 +174,11 @@ class PostType extends Base
         ];
 
         foreach ($required as $key) {
-            // if the name is set, assign it
-            if (isset($this->names[$key])) {
-                $this->$key = $this->names[$key];
+            $name = $this->names[$key] ?? "";
+
+            // If attribute already set skip it
+            if (!empty($name)) {
+                $this->$key = $name;
                 continue;
             }
 
@@ -205,9 +186,7 @@ class PostType extends Base
             if (in_array($key, ['singular', 'plural'])) {
                 // create a human friendly name
                 $name = ucwords(strtolower(str_replace(['-', '_'], ' ', $this->names['name'])));
-            }
-
-            if ($key === 'slug') {
+            } elseif ($key === 'slug') {
                 // create a slug friendly name
                 $name = strtolower(str_replace([' ', '_'], '-', $this->names['name']));
             }
@@ -249,7 +228,7 @@ class PostType extends Base
         }
 
         // set the menu icon
-        if (!isset($options['menu_icon']) && isset($this->icon)) {
+        if (!isset($options['menu_icon']) && !empty($this->icon)) {
             $options['menu_icon'] = $this->icon;
         }
 

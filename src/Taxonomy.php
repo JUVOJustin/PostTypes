@@ -24,28 +24,9 @@ class Taxonomy extends Base
 
     /**
      * The column manager for the Taxonomy
-     * @var mixed
+     * @var Columns
      */
     public Columns $columns;
-
-    /**
-     * Set the names for the Taxonomy
-     * @param mixed $names The name(s) for the Taxonomy
-     * @return $this
-     */
-    public function names($names): Taxonomy
-    {
-        if (is_string($names)) {
-            $names = ['name' => $names];
-        }
-
-        $this->names = $names;
-
-        // create names for the Taxonomy
-        $this->createNames();
-
-        return $this;
-    }
 
     /**
      * Assign a PostType to register the Taxonomy to
@@ -107,7 +88,7 @@ class Taxonomy extends Base
         $options = array_replace_recursive($options, $this->createOptions());
 
         // register the Taxonomy with WordPress.
-        register_taxonomy($this->name, null, $options);
+        register_taxonomy($this->name, [], $options);
     }
 
     /**
@@ -128,7 +109,7 @@ class Taxonomy extends Base
      * Create names for the Taxonomy
      * @return void
      */
-    public function createNames()
+    public function createNames(): void
     {
         $required = [
             'name',
@@ -138,9 +119,11 @@ class Taxonomy extends Base
         ];
 
         foreach ($required as $key) {
-            // if the name is set, assign it
-            if (isset($this->names[$key])) {
-                $this->$key = $this->names[$key];
+            $name = $this->names[$key] ?? "";
+
+            // If attribute already set skip it
+            if (!empty($name)) {
+                $this->$key = $name;
                 continue;
             }
 
@@ -148,9 +131,7 @@ class Taxonomy extends Base
             if (in_array($key, ['singular', 'plural'])) {
                 // create a human friendly name
                 $name = ucwords(strtolower(str_replace(['-', '_'], ' ', $this->names['name'])));
-            }
-
-            if ($key === 'slug') {
+            } elseif ($key === 'slug') {
                 // create a slug friendly name
                 $name = strtolower(str_replace([' ', '_'], '-', $this->names['name']));
             }

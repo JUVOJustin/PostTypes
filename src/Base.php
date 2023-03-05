@@ -2,7 +2,7 @@
 
 namespace PostTypes;
 
-class Base
+abstract class Base
 {
 
     /**
@@ -80,6 +80,29 @@ class Base
 
         $this->columns = new Columns();
     }
+
+    /**
+     * Set the names for the Entity
+     * @param mixed $names A string for the name, or an array of names
+     * @return $this
+     */
+    public function names($names): self
+    {
+        // only the post type name is passed
+        if (is_string($names)) {
+            $names = ['name' => $names];
+        }
+
+        // set the names array
+        $this->names = $names;
+
+        // create names for the PostType
+        $this->createNames();
+
+        return $this;
+    }
+
+    abstract public function createNames(): void;
 
     /**
      * Set the options for the Entity
