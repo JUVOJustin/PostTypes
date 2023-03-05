@@ -292,7 +292,11 @@ class Taxonomy extends Base
     public function sortSortableColumns(\WP_Term_Query $query)
     {
         // don't modify the query if we're not in the post type admin
-        if (!is_admin() || !in_array($this->name, $query->query_vars['taxonomy'])) {
+        if (
+            !is_admin()
+            || empty($query->query_vars['taxonomy'])
+            || !in_array($this->name, $query->query_vars['taxonomy'])
+        ) {
             return;
         }
 
